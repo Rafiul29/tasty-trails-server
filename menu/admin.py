@@ -4,7 +4,7 @@ from .models import MenuItem, Favourite
 
 class  MenuItemAdmin(admin.ModelAdmin):
   list_display=['id','menu_name','price','category','user']
-  
+  prepopulated_fields={'slug':('name',),}
   def menu_name(self,obj):
     return f"{obj.name}"
    
