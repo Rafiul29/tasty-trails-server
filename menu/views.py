@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import viewsets,filters,status
 from django.db import IntegrityError
-from rest_framework.exceptions import ValidationError
+
 from .serializers import MenuItemSerializer,FavouriteSerializer
 from .models import MenuItem,Favourite
 
