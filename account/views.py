@@ -28,7 +28,12 @@ class UserRegistrationView(APIView):
             user=serializer.save()
             token=default_token_generator.make_token(user)
             uid=urlsafe_base64_encode(force_bytes(user.pk))
-
+            confirm_link=f'http://127.0.0.1:8000/api/auth/active/{uid}/{token}/'
+            email_subject='Confirm Your Email for Tasty Trails'
+            email_body=render_to_string('confirm_email.html',{'confirm_link':confirm_link})
+            email = EmailMultiAlternatives(email_subject , '', to=[user.email])
+            email.attach_alternative(email_body, "text/html")
+            email.send()
             return Response(f'Check your mail confirmation your account number')
         
         return Response(serializer.errors)   
