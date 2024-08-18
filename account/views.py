@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
 from django.conf import settings
-from rest_framework import viewsets
+from rest_framework import viewsets,status
 from rest_framework.views import APIView
 from account.models import User
 from .serializers import UserSerializer,UserLoginSerializer
@@ -38,3 +38,21 @@ class UserRegistrationView(APIView):
         
         return Response(serializer.errors)   
 
+
+def activate(request,uid64,token):
+    try:
+        uid = urlsafe_base64_decode(uid64).decode() 
+        user=get_user_model().objects.get(pk=uid) 
+    except get_user_model().DoesNotExist:
+        user =None
+
+    if user is not None and default_token_generator.check_token(user, token):
+        print("find ")
+        user.is_active = True
+        user.save()
+        # return Response({"error": "User does not have a bank account."}, status=status.HTTP_400_BAD_REQUEST)
+        # return Response('User Account activate')
+        return redirect(settings.LOGIN_URL)
+    else:
+        return Response(settings.REGISTER_URL)
+    
