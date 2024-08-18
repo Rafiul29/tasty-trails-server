@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from .models import User
 
-class UserSerializer(serializers.ModelSerializer):
+# 
+class UserRegistrationSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(required = True) 
     class Meta:
         model = User
@@ -33,4 +34,3 @@ class UserSerializer(serializers.ModelSerializer):
 class UserLoginSerializer(serializers.Serializer):
   username = serializers.CharField(required = True)
   password = serializers.CharField(required = True)
-

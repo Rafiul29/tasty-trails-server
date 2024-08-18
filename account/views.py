@@ -3,7 +3,7 @@ from django.conf import settings
 from rest_framework import viewsets,status
 from rest_framework.views import APIView
 from account.models import User
-from .serializers import UserSerializer,UserLoginSerializer
+from .serializers import UserRegistrationSerializer,UserLoginSerializer
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
@@ -20,7 +20,7 @@ from rest_framework.authtoken.models import Token
 
 # Create your views here.
 class UserRegistrationView(APIView):
-    serializer_class = UserSerializer
+    serializer_class = UserRegistrationSerializer
 
     def post(self,request):
         serializer=self.serializer_class(data=request.data)
@@ -56,3 +56,28 @@ def activate(request,uid64,token):
     else:
         return Response(settings.REGISTER_URL)
     
+
+class UserLoginView(APIView):
+  def post(self, request):
+    serializer = UserLoginSerializer(data = self.request.data)
+    if serializer.is_valid():
+      username = serializer.validated_data['username']
+      password = serializer.validated_data['password']
+
+      user = authenticate(username= username, password=password)
+            
+      if user:
+         token, _ = Token.objects.get_or_create(user=user)
+         login(request,user)
+         return Response({'token' : token.key, 'user' :{
+            "user_id":user.id,
+            'username':user.username,
+            'first_name':user.first_name,
+            'last_name':user.last_name,
+            'email':user.email,
+            'phone_no':user.phone_no
+         }})
+      else:
+        return Response({'error' : "username and password incorrect"},status=status.HTTP_400_BAD_REQUEST)
+    return Response(serializer.errors)
+  
