@@ -34,7 +34,7 @@ class UserRegistrationView(APIView):
             email = EmailMultiAlternatives(email_subject , '', to=[user.email])
             email.attach_alternative(email_body, "text/html")
             email.send()
-            return Response(f'Check your mail confirmation your account number')
+            return Response(f'Check your mail confirmation your account')
         
         return Response(serializer.errors)   
 
@@ -80,4 +80,12 @@ class UserLoginView(APIView):
       else:
         return Response({'error' : "username and password incorrect"},status=status.HTTP_400_BAD_REQUEST)
     return Response(serializer.errors)
+  
+
+class UserLogoutView(APIView):
+   
+   def get(self,request):
+      request.user.auth_token.delete()
+      logout(request)
+      return Response({"success": "User Logout Successfull"}, status=status.HTTP_200_OK)
   
