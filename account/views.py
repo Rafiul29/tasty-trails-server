@@ -63,7 +63,7 @@ class UserLoginView(APIView):
     if serializer.is_valid():
       username = serializer.validated_data['username']
       password = serializer.validated_data['password']
-        
+
       user = authenticate(username= username, password=password)
             
       if user:
@@ -75,7 +75,8 @@ class UserLoginView(APIView):
             'first_name':user.first_name,
             'last_name':user.last_name,
             'email':user.email,
-            'phone_no':user.phone_no
+            'phone_no':user.phone_no,
+            'role':user.role
          }})
       else:
         return Response({'error' : "username and password incorrect"},status=status.HTTP_400_BAD_REQUEST)
