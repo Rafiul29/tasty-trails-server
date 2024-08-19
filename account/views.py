@@ -34,7 +34,7 @@ class UserRegistrationView(APIView):
             email = EmailMultiAlternatives(email_subject , '', to=[user.email])
             email.attach_alternative(email_body, "text/html")
             email.send()
-            return Response(f'Check your mail confirmation your account')
+            return Response({'success': 'Check your confirmation mail. Please verify account!'}, status=status.HTTP_200_OK)
         
         return Response(serializer.errors)   
 
@@ -47,7 +47,6 @@ def activate(request,uid64,token):
         user =None
 
     if user is not None and default_token_generator.check_token(user, token):
-        print("find ")
         user.is_active = True
         user.save()
         # return Response({"error": "User does not have a bank account."}, status=status.HTTP_400_BAD_REQUEST)
@@ -63,9 +62,9 @@ class UserLoginView(APIView):
     if serializer.is_valid():
       username = serializer.validated_data['username']
       password = serializer.validated_data['password']
-
+      
       user = authenticate(username= username, password=password)
-            
+
       if user:
          token, _ = Token.objects.get_or_create(user=user)
          login(request,user)

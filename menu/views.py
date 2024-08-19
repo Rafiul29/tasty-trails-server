@@ -12,8 +12,12 @@ from .models import MenuItem,Favourite
 class MenuItemViewSet(viewsets.ModelViewSet):
   queryset=MenuItem.objects.all()
   serializer_class=MenuItemSerializer
-  filter_backends=[]
-  search_fields = ['category__name','slug']
+  filter_backends=[filters.SearchFilter]
+  search_fields = ['category__name','slug','name']
+
+  def get_queryset(self):
+      return super().get_queryset()
+  
 
 class FavouriteSpecificAdvertisement(filters.BaseFilterBackend):
    def filter_queryset(self,request,query_set,view):
