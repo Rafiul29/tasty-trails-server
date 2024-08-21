@@ -13,7 +13,7 @@ class MenuItemViewSet(viewsets.ModelViewSet):
   queryset=MenuItem.objects.all()
   serializer_class=MenuItemSerializer
   filter_backends=[filters.SearchFilter]
-  search_fields = ['category__name','slug','name']
+  search_fields = ['category__name','category__slug','name','slug']
 
   def get_queryset(self):
       return super().get_queryset()
