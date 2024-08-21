@@ -19,7 +19,7 @@ def _cart_id(request):
 class CartItemViewSet(viewsets.ModelViewSet):
     queryset = CartItem.objects.all()
     serializer_class = CartItemSerializer
-
+  
     def create(self, request, *args, **kwargs):
         user = self.request.user
         menu_item = request.data.get('menu_item')
@@ -37,7 +37,7 @@ class CartItemViewSet(viewsets.ModelViewSet):
             cart_item=CartItem.objects.get(menu_item=menu,user=user)
             cart_item.quantity+=1
             cart_item.save()
-            return Response({"success": "Already added into cart increase quantity"}, status=status.HTTP_200_OK)
+            return Response({"success": "Cart item increase quantity"}, status=status.HTTP_200_OK)
           else:
             cart_item = CartItem.objects.create(
               menu_item=menu,
@@ -71,3 +71,13 @@ class CartItemViewSet(viewsets.ModelViewSet):
             
       except CartItem.DoesNotExist:
           return Response({"error": "menu item does not update into cart"}, status=status.HTTP_400_BAD_REQUEST)
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            self.perform_destroy(instance)
+            return Response({"success": "Cart item removed successfully."}, status=status.HTTP_200_OK)
+        except CartItem.DoesNotExist:
+            return Response({"error": "Cart not found."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
