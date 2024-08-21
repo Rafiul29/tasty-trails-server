@@ -19,10 +19,9 @@ class MenuItemViewSet(viewsets.ModelViewSet):
       return super().get_queryset()
   
 
-class FavouriteSpecificAdvertisement(filters.BaseFilterBackend):
+class SpecificFavouriteMenu(filters.BaseFilterBackend):
    def filter_queryset(self,request,query_set,view):
     user_id=request.query_params.get('user_id')
-    print(user_id)
     if user_id:
       return query_set.filter(user=user_id)
     return query_set
@@ -31,7 +30,7 @@ class FavouriteSpecificAdvertisement(filters.BaseFilterBackend):
 class FavouriteViewSet(viewsets.ModelViewSet):
     queryset = Favourite.objects.all()
     serializer_class = FavouriteSerializer
-    filter_backends = [FavouriteSpecificAdvertisement]
+    filter_backends = [SpecificFavouriteMenu]
 
     def create(self, request, *args, **kwargs):
         user = request.data.get('user')

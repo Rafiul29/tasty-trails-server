@@ -16,10 +16,19 @@ def _cart_id(request):
     cart=request.session.create()
   return cart
 
+
+class SpecificUserCartItem(filters.BaseFilterBackend):
+   def filter_queryset(self,request,query_set,view):
+    user_id=request.query_params.get('user_id')
+    if user_id:
+      return query_set.filter(user=user_id)
+    return query_set
+
+
 class CartItemViewSet(viewsets.ModelViewSet):
     queryset = CartItem.objects.all()
     serializer_class = CartItemSerializer
-  
+    filter_backends = [SpecificUserCartItem]
     def create(self, request, *args, **kwargs):
         user = self.request.user
         menu_item = request.data.get('menu_item')
@@ -60,7 +69,10 @@ class CartItemViewSet(viewsets.ModelViewSet):
       try:
           if CartItem.objects.filter(user=user,menu_item=menu_item).exists():
             cart_item=CartItem.objects.get(menu_item=menu,user=user)
-            if cart_item.quantity<int(quantity):
+            if int(quantity)==0:
+               cart_item.delete()
+               return Response({"success": "Cart item removed successfully."}, status=status.HTTP_200_OK)
+            elif cart_item.quantity<int(quantity):
               cart_item.quantity+=1
               cart_item.save()
               return Response({"increase": "increase cart quantity"}, status=status.HTTP_200_OK)
