@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     'menu',
     'category',
     'carts',
-    # 'orders',
+    'orders',
 ]
 
 CORS_ORIGIN_WHITELIST = (
