@@ -24,7 +24,6 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
   delivery_address = DeliveryAddressSerializer()
-  user=UserProfileSerializer()
   class Meta:
     model=Order
     fields='__all__'
