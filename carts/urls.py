@@ -7,6 +7,8 @@ router = DefaultRouter()
 
 router.register('list', views.CartItemViewSet)
 
+
 urlpatterns = [
     path('', include(router.urls)),
+    path('checkout/',views.checkout,name='checkout'),
 ]

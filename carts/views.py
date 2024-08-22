@@ -4,6 +4,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import viewsets,filters,status
 from django.db import IntegrityError
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+
 
 from .models import CartItem,Cart
 from .serializers import CartItemSerializer
@@ -21,7 +24,8 @@ class SpecificUserCartItem(filters.BaseFilterBackend):
    def filter_queryset(self,request,query_set,view):
     user_id=request.query_params.get('user_id')
     if user_id:
-      return query_set.filter(user=user_id)
+      print(query_set)
+      return query_set.filter(user=user_id,is_active=True)
     return query_set
 
 
@@ -93,3 +97,28 @@ class CartItemViewSet(viewsets.ModelViewSet):
             return Response({"error": "Cart not found."}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET']) 
+@permission_classes([IsAuthenticated])
+def checkout(request):
+    try:
+      tax=0
+      grand_total=0
+      total=0
+
+      cart_items= CartItem.objects.filter(user=request.user,is_active=True)
+  
+      for cart_item in cart_items:
+         total+=cart_item.menu_item.price*cart_item.quantity
+      tax=(2*total)/100
+      grand_total=total+tax
+
+      return Response({"result": {
+         'total':total,
+         'tax':tax,
+         'grand_total':grand_total
+      }}, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
