@@ -1,9 +1,9 @@
 from django.db import models
 from account.models import User
 from menu.models import MenuItem
-
+import uuid
 # Create your models here.
-class ShippingAddress(models.Model):
+class DeliveryAddress(models.Model):
   user=models.ForeignKey(User,on_delete=models.CASCADE,null=True)
   name=models.CharField(max_length=255,null=True)
   email=models.CharField(max_length=100,null=True)
@@ -21,15 +21,15 @@ class ShippingAddress(models.Model):
 status_choices = [
         ('Pending', 'Pending'),
         ('Processing', 'Processing'),
-        ('Completed', 'Completed'),
+        ('Delivered', 'Delivered'),
         ('Cancelled', 'Cancelled'),
     ]
 
 class Order(models.Model):
-  order_number=models.CharField(max_length=10,unique=True)
+  order_number=models.CharField(max_length=10,unique=True,blank=True,null=True)
   user = models.ForeignKey(User, on_delete=models.CASCADE)
-  shipping_address = models.ForeignKey(ShippingAddress, on_delete=models.SET_NULL, null=True)
-  order_total = models.DecimalField(max_digits=10, decimal_places=2)
+  delivery_address = models.ForeignKey(DeliveryAddress, on_delete=models.SET_NULL, null=True,blank=True)
+  order_total = models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True)
   order_date = models.DateTimeField(auto_now_add=True)
   status = models.CharField(max_length=20, choices=status_choices, default='Pending')
 
