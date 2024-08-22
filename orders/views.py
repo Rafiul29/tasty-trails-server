@@ -23,6 +23,8 @@ class OrderItemViewSet(viewsets.ModelViewSet):
   serializer_class=OrderItemSerializer
   permission_classes = [IsAuthenticated]
 
+
+
 class DeliveryAddressViewSet(viewsets.ModelViewSet):
   queryset=DeliveryAddress.objects.all()
   serializer_class=DeliveryAddressSerializer

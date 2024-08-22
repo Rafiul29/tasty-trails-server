@@ -4,7 +4,9 @@ from rest_framework.exceptions import ValidationError
 
 from .models import DeliveryAddress,Order,OrderItem
 from carts.models import CartItem
+from menu.serializers import MenuItemSerializer
 from account.models import User
+from account.serializers import UserProfileSerializer,UserRegistrationSerializer
 import uuid
 
 class DeliveryAddressSerializer(serializers.ModelSerializer):
@@ -14,6 +16,7 @@ class DeliveryAddressSerializer(serializers.ModelSerializer):
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
+  menu_item=MenuItemSerializer()
   class Meta:
     model=OrderItem
     fields='__all__'
@@ -21,12 +24,13 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
   delivery_address = DeliveryAddressSerializer()
+  user=UserProfileSerializer()
   class Meta:
     model=Order
     fields='__all__'
 
   def create(self, validated_data):
-    print(validated_data)
+   
     delivery_address_data = validated_data.pop('delivery_address')
     user = self.context['request'].user
   
