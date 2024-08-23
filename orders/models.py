@@ -27,8 +27,8 @@ status_choices = [
 
 class Order(models.Model):
   order_number=models.CharField(max_length=10,unique=True,blank=True,null=True)
-  user = models.ForeignKey(User, on_delete=models.CASCADE)
-  delivery_address = models.ForeignKey(DeliveryAddress, on_delete=models.SET_NULL, null=True,blank=True)
+  user = models.ForeignKey(User, on_delete=models.CASCADE,null=True)
+  delivery_address = models.ForeignKey(DeliveryAddress, on_delete=models.CASCADE, null=True,blank=True)
   order_total = models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True)
   order_date = models.DateTimeField(auto_now_add=True)
   status = models.CharField(max_length=20, choices=status_choices, default='Pending')

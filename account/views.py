@@ -97,8 +97,8 @@ class UserProfileView(generics.RetrieveAPIView):
     serializer_class = UserProfileSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_object(self):
-        user = self.request.user
-        # Debug: Print or log user data
-        print(f"User: {user}")
-        return user
+    # def get_object(self):
+    #     user = self.request.user
+    #     # Debug: Print or log user data
+    #     print(f"User: {user}")
+    #     return user

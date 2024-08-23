@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from carts.models import CartItem 
 from .models import Order,OrderItem,DeliveryAddress
@@ -28,12 +29,44 @@ class OrderViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+    def update(self, request, *args, **kwargs):
+      print(kwargs,args)
+      partial = kwargs.pop('partial', False)
+      instance = self.get_object()   
+
+      status_value = request.data.get('status')
+
+      if status_value is not None:
+          instance.status = status_value
+
+      serializer = self.get_serializer(instance, data=request.data, partial=partial)
+
+      if serializer.is_valid():
+          self.perform_update(serializer)
+          return Response(serializer.data)
+      else:
+          return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+
+
+class SpecificOrderItemUser(filters.BaseFilterBackend):
+   def filter_queryset(self,request,query_set,view):
+    order_id=request.query_params.get('order_id')
+    if order_id:
+      return query_set.filter(order=order_id)
+    return query_set
 
 
 class OrderItemViewSet(viewsets.ModelViewSet):
   queryset=OrderItem.objects.all()
   serializer_class=OrderItemSerializer
   permission_classes = [IsAuthenticated]
+  filter_backends = [SpecificOrderItemUser]
+
 
 
 class DeliveryAddressViewSet(viewsets.ModelViewSet):

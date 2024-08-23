@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import ValidationError
-
+from rest_framework.response import Response
+from rest_framework import status
 from .models import DeliveryAddress,Order,OrderItem
 from carts.models import CartItem
 from menu.serializers import MenuItemSerializer
@@ -23,7 +24,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
-  delivery_address = DeliveryAddressSerializer()
+  delivery_address = DeliveryAddressSerializer(required=False)
   class Meta:
     model=Order
     fields='__all__'
@@ -63,13 +64,4 @@ class OrderSerializer(serializers.ModelSerializer):
     active_cart_items.delete()
     return order
   
-  def update(self, instance, validated_data):
-        # Only update the status field
-        status = validated_data.get('status', None)
-        if status is not None:
-            instance.status = status
-            instance.save()
-        return instance
-
-
 
