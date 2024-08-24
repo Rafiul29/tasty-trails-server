@@ -24,7 +24,6 @@ class SpecificUserCartItem(filters.BaseFilterBackend):
    def filter_queryset(self,request,query_set,view):
     user_id=request.query_params.get('user_id')
     if user_id:
-      print(query_set)
       return query_set.filter(user=user_id,is_active=True)
     return query_set
 

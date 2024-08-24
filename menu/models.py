@@ -8,7 +8,7 @@ class MenuItem(models.Model):
   description=models.TextField()
   ingredients=models.CharField(max_length=200)
   price=models.DecimalField(max_digits=10,decimal_places=2)
-  image=models.ImageField(upload_to='menu/images')
+  image=models.ImageField(upload_to='menu/images/')
 
   slug=models.SlugField(max_length=200,null=True,)
   user=models.ForeignKey(User,related_name='menuitem',on_delete=models.CASCADE)

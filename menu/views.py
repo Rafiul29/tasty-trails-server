@@ -3,10 +3,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import viewsets,filters,status
 from django.db import IntegrityError
+from rest_framework.parsers import MultiPartParser, FormParser
 
 from .serializers import MenuItemSerializer,FavouriteSerializer
 from .models import MenuItem,Favourite
-
 
 # Create your views here.
 class MenuItemViewSet(viewsets.ModelViewSet):
@@ -14,9 +14,18 @@ class MenuItemViewSet(viewsets.ModelViewSet):
   serializer_class=MenuItemSerializer
   filter_backends=[filters.SearchFilter]
   search_fields = ['category__slug','name','slug']
+#   parser_classes = [FormParser]
 
   def get_queryset(self):
       return super().get_queryset()
+  
+  def post(self, request, *args, **kwargs):
+        serializer = MenuItemSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
   
 
 class SpecificFavouriteMenu(filters.BaseFilterBackend):

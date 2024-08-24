@@ -33,7 +33,6 @@ ALLOWED_HOSTS = ["*"]
 LOGIN_URL=env('APP_LOGIN_URL')
 REGISTER_URL=env('APP_REGISTER_URL')
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -59,8 +58,9 @@ CORS_ORIGIN_WHITELIST = (
     "http://localhost:3000",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
+    "https://tasty-trails-server.onrender.com",
 )
-CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000',"http://localhost:8000",]
+CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000',"http://localhost:8000", "https://tasty-trails-server.onrender.com",]
 
 CORS_ALLOW_ALL_ORIGINS=True
 
@@ -160,6 +160,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
