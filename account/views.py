@@ -4,7 +4,7 @@ from rest_framework import generics
 from rest_framework import viewsets,status
 from rest_framework.views import APIView
 from account.models import User
-from .serializers import UserRegistrationSerializer,UserLoginSerializer,UserProfileSerializer
+from .serializers import UserRegistrationSerializer,UserLoginSerializer
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
@@ -91,15 +91,3 @@ class UserLogoutView(APIView):
       logout(request)
       return Response({"success": "User Logout Successfull"}, status=status.HTTP_200_OK)
 
-User = get_user_model()
-
-class UserProfileView(generics.RetrieveAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserProfileSerializer
-    permission_classes = [IsAuthenticated]
-
-    # def get_object(self):
-    #     user = self.request.user
-    #     # Debug: Print or log user data
-    #     print(f"User: {user}")
-    #     return user

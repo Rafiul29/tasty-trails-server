@@ -7,7 +7,7 @@ from .models import DeliveryAddress,Order,OrderItem
 from carts.models import CartItem
 from menu.serializers import MenuItemSerializer
 from account.models import User
-from account.serializers import UserProfileSerializer,UserRegistrationSerializer
+from account.serializers import UserRegistrationSerializer
 import uuid
 
 class DeliveryAddressSerializer(serializers.ModelSerializer):
