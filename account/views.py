@@ -38,8 +38,8 @@ class UserRegistrationView(APIView):
             email.send()
             # create UserBank account 
             account_no=user.id+10000
-            UserBankAccount.objects.create(user,account_no=account_no)
-            return Response({'success': 'Check your confirmation mail. Please verify account! {account_no}'}, status=status.HTTP_200_OK)
+            UserBankAccount.objects.create(user=user, account_no=account_no)
+            return Response({'success': 'Check your confirmation mail. Please verify account'}, status=status.HTTP_200_OK)
         
         return Response(serializer.errors)   
 

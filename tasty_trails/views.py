@@ -19,7 +19,7 @@ class UserBankAccountViewSet(viewsets.ModelViewSet):
         queryset = UserBankAccount.objects.all()
         user_id = self.request.query_params.get('user_id')
         if user_id:
-            queryset = queryset.filter(user_id=user_id)
+           return queryset.filter(user=user_id)
         return queryset
 
     @action(detail=False, methods=['post'])
