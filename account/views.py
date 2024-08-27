@@ -3,7 +3,7 @@ from django.conf import settings
 from rest_framework import generics
 from rest_framework import viewsets,status
 from rest_framework.views import APIView
-from account.models import User
+from account.models import User,UserBankAccount
 from .serializers import UserRegistrationSerializer,UserLoginSerializer
 from rest_framework.response import Response
 from django.contrib.auth.models import User
@@ -36,7 +36,10 @@ class UserRegistrationView(APIView):
             email = EmailMultiAlternatives(email_subject , '', to=[user.email])
             email.attach_alternative(email_body, "text/html")
             email.send()
-            return Response({'success': 'Check your confirmation mail. Please verify account!'}, status=status.HTTP_200_OK)
+            # create UserBank account 
+            account_no=user.id+10000
+            UserBankAccount.objects.create(user,account_no=account_no)
+            return Response({'success': 'Check your confirmation mail. Please verify account! {account_no}'}, status=status.HTTP_200_OK)
         
         return Response(serializer.errors)   
 

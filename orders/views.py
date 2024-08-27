@@ -2,12 +2,13 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-
+from rest_framework.exceptions import ValidationError
 from carts.models import CartItem 
 from .models import Order,OrderItem,DeliveryAddress
+from account.models import UserBankAccount
 from .serializers import OrderSerializer,OrderItemSerializer,DeliveryAddressSerializer
 from rest_framework import viewsets,filters,status
-
+import uuid
 
 class SpecificOrderUser(filters.BaseFilterBackend):
    def filter_queryset(self,request,query_set,view):
@@ -26,8 +27,6 @@ class OrderViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return Order.objects.filter()
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
 
     def update(self, request, *args, **kwargs):
       print(kwargs,args)

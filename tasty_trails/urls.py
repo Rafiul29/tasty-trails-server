@@ -19,7 +19,7 @@ from django.urls import path,include
 
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import UserProfileViewSet
+from .views import UserProfileViewSet,UserBankAccountViewSet
 
 from rest_framework.routers import DefaultRouter
 
@@ -27,7 +27,8 @@ router = DefaultRouter()
 
 
 router.register('users', UserProfileViewSet)
- 
+router.register('user-bank-accounts', UserBankAccountViewSet)
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
