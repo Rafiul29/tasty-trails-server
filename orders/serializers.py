@@ -99,10 +99,22 @@ class OrderSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("No active cart items found for the user.")
         
      
-        order_total = sum(item.quantity * item.menu_item.price for item in active_cart_items)
+        # order_total = sum(item.quantity * item.menu_item.price for item in active_cart_items)
+        # tax = (2 * order_total) / 100
+        # order_total += tax
+
+        order_total=0
+        discount=0
+        total_discount=0
+
+        for cart_item in active_cart_items:
+            discount=(cart_item.menu_item.price*cart_item.menu_item.discount/100)*cart_item.quantity
+            order_total+=(cart_item.menu_item.price*cart_item.quantity)-discount
+            total_discount+=discount
+
         tax = (2 * order_total) / 100
         order_total += tax
-
+        
         order_number = str(uuid.uuid4())[:10].replace('-', '').upper()
 
      
@@ -118,7 +130,7 @@ class OrderSerializer(serializers.ModelSerializer):
         delivery_address = DeliveryAddress.objects.create(**delivery_address_data)
 
         order = Order.objects.create(
-           delivery_address=delivery_address,order_number=order_number,order_total=order_total,**validated_data
+           delivery_address=delivery_address,order_number=order_number,total_discount=total_discount,order_total=order_total,**validated_data
         )
 
 
@@ -128,7 +140,7 @@ class OrderSerializer(serializers.ModelSerializer):
             order=order,
             menu_item=item.menu_item,
             quantity=item.quantity,
-            price=item.menu_item.price
+            price=item.menu_item.price-(item.menu_item.price*item.menu_item.discount/100)
             )
 
         user_account.balance-=order_total

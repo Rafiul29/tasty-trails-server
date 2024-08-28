@@ -3,7 +3,7 @@ from .models import MenuItem, Favourite
 # Register your models here.
 
 class  MenuItemAdmin(admin.ModelAdmin):
-  list_display=['id','menu_name','price','category','user']
+  list_display=['id','menu_name','price','category','discount','avarate_rating','user']
   prepopulated_fields={'slug':('name',),}
   def menu_name(self,obj):
     return f"{obj.name}"

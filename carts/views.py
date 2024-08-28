@@ -105,18 +105,24 @@ def checkout(request):
       tax=0
       grand_total=0
       total=0
+      discount=0
+      total_discount=0
 
       cart_items= CartItem.objects.filter(user=request.user,is_active=True)
   
       for cart_item in cart_items:
-         total+=cart_item.menu_item.price*cart_item.quantity
+         discount=(cart_item.menu_item.price*cart_item.menu_item.discount/100)*cart_item.quantity
+         total+=(cart_item.menu_item.price*cart_item.quantity)-discount
+         total_discount+=discount
+
+   
       tax=(2*total)/100
       grand_total=total+tax
-
       return Response({"result": {
          'total':total,
          'tax':tax,
-         'grand_total':grand_total
+         'grand_total':grand_total,
+         'total_discount':total_discount
       }}, status=status.HTTP_200_OK)
     
     except Exception as e:

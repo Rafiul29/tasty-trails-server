@@ -31,6 +31,7 @@ class Order(models.Model):
   delivery_address = models.ForeignKey(DeliveryAddress, on_delete=models.CASCADE, null=True,blank=True)
   order_total = models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True)
   order_date = models.DateTimeField(auto_now_add=True)
+  total_discount=models.IntegerField(null=True,blank=True,default=0)
   status = models.CharField(max_length=20, choices=status_choices, default='Pending')
 
   def __str__(self) -> str:
@@ -41,6 +42,7 @@ class OrderItem(models.Model):
   user = models.ForeignKey(User, on_delete=models.CASCADE)
   menu_item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
   quantity = models.IntegerField()
+
   price = models.DecimalField(max_digits=10, decimal_places=2)
 
   def __str__(self) -> str:
