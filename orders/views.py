@@ -10,6 +10,7 @@ from .serializers import OrderSerializer,OrderItemSerializer,DeliveryAddressSeri
 from rest_framework import viewsets,filters,status
 import uuid
 
+
 class SpecificOrderUser(filters.BaseFilterBackend):
    def filter_queryset(self,request,query_set,view):
     user_id=request.query_params.get('user_id')
@@ -48,10 +49,6 @@ class OrderViewSet(viewsets.ModelViewSet):
 
 
 
-
-
-
-
 class SpecificOrderItemUser(filters.BaseFilterBackend):
    def filter_queryset(self,request,query_set,view):
     order_id=request.query_params.get('order_id')
@@ -71,3 +68,8 @@ class OrderItemViewSet(viewsets.ModelViewSet):
 class DeliveryAddressViewSet(viewsets.ModelViewSet):
   queryset=DeliveryAddress.objects.all()
   serializer_class=DeliveryAddressSerializer
+
+
+
+
+

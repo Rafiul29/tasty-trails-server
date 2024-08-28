@@ -19,7 +19,7 @@ from django.urls import path,include
 
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import UserProfileViewSet,UserBankAccountViewSet
+from .views import UserProfileViewSet,UserBankAccountViewSet,ourstatistics
 
 from rest_framework.routers import DefaultRouter
 
@@ -29,6 +29,7 @@ router = DefaultRouter()
 router.register('users', UserProfileViewSet)
 router.register('user-bank-accounts', UserBankAccountViewSet)
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
@@ -37,7 +38,7 @@ urlpatterns = [
     path('category/',include('category.urls')),
     path('carts/',include('carts.urls')),
     path('orders/',include('orders.urls')),
-
+    path('ourstatistics/',ourstatistics,name='ourstatistics'),
 ]
 
 

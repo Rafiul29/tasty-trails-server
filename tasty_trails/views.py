@@ -1,9 +1,12 @@
 from account.models import User,UserBankAccount
+from orders.models import Order
+from menu.models import MenuItem
 from rest_framework import viewsets,status
 from . import serializers
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.decorators import api_view
 
 class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -24,16 +27,8 @@ class UserBankAccountViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'])
     def deposit(self, request):
-        # account_no = request.data.get('account_no')
-        # user_id = self.request.query_params.get('user_id')
         balance = request.data.get('balance')
        
-        # if account_no is None:
-        #     return Response({"error": "Account number incorrect"}, status=status.HTTP_400_BAD_REQUEST)
-        # if user_id is None:
-        #     return Response({"error": "User ID is required."}, status=status.HTTP_400_BAD_REQUEST)
-
-
         if balance is None:
             return Response({"error": "balance is required"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -56,3 +51,31 @@ class UserBankAccountViewSet(viewsets.ModelViewSet):
         account.save()
 
         return Response({"message": "Deposit successful", "new_balance": account.balance}, status=status.HTTP_200_OK)
+    
+
+
+@api_view(['GET']) 
+def ourstatistics(request):
+    try:
+      total_users=0
+      total_menus=0
+      complete_orders=0
+      total_sales=0
+      
+      total_users=User.objects.all().count()
+      total_menus=MenuItem.objects.all().count()
+      order_delivary=Order.objects.filter(status='Delivered')
+      complete_orders=order_delivary.count()
+
+      for order in order_delivary:
+          total_sales+=order.order_total
+
+      return Response({"result": {
+         'total_users':total_users,
+         'total_menus':total_menus,
+         'complete_orders':complete_orders,
+         'total_sales':total_sales
+      }}, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
