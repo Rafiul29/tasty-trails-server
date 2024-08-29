@@ -5,9 +5,9 @@ from rest_framework import viewsets,filters,status
 from django.db import IntegrityError
 from rest_framework.parsers import MultiPartParser, FormParser
 
-from .serializers import MenuItemSerializer,FavouriteSerializer
-from .models import MenuItem,Favourite
-
+from .serializers import MenuItemSerializer,FavouriteSerializer,ReviewSerializer
+from .models import MenuItem,Favourite,Review
+from orders.models import Order,OrderItem
 # Create your views here.
 class MenuItemViewSet(viewsets.ModelViewSet):
   queryset=MenuItem.objects.all()
@@ -63,3 +63,53 @@ class FavouriteViewSet(viewsets.ModelViewSet):
             return Response({"error": "Favourite not found."}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+
+    def list(self, request, *args, **kwargs):
+        menu_item = request.query_params.get('menu_item')
+        queryset = self.get_queryset()
+        
+        if menu_item:
+            queryset = queryset.filter(menu_item=menu_item)
+        
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        user = request.user  
+        menu_item = request.data.get('menu_item')
+
+        # Check if the user has ordered the item and the order has been delivered
+        if OrderItem.objects.filter(user=user, menu_item=menu_item, order__status="Delivered").exists():
+            # Check if the user has already reviewed the menu item
+            if Review.objects.filter(user=user, menu_item=menu_item).exists():
+                return Response({"error": "You have already reviewed this menu item."}, status=status.HTTP_400_BAD_REQUEST)
+            
+            try:
+                # Manually create the review instance, passing the actual User instance
+                review = Review.objects.create(
+                    user=user,  # Pass the User instance directly
+                    menu_item_id=menu_item,  # Use the menu_item ID directly
+                    comment=request.data.get('comment'),
+                    rating=request.data.get('rating')
+                )
+                
+                # Serialize the newly created review
+                serializer = ReviewSerializer(review)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            
+            except IntegrityError:
+                return Response({"error": "An error occurred while processing your review."}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({"error": "You can only review menu items after your order has been delivered."}, status=status.HTTP_400_BAD_REQUEST)
+
+
+    def retrieve(self, request, pk=None, *args, **kwargs):
+        review = self.get_object()
+        print(review.id)
+        serializer = self.get_serializer(review)
+        return Response(serializer.data)

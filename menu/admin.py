@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import MenuItem, Favourite
+from .models import MenuItem, Favourite, Review
 # Register your models here.
 
 class  MenuItemAdmin(admin.ModelAdmin):
@@ -21,3 +21,16 @@ class  FavouriteAdmin(admin.ModelAdmin):
   
 
 admin.site.register(Favourite,FavouriteAdmin)
+
+
+class  ReviewAdmin(admin.ModelAdmin):
+  list_display=['id','person_name','menu_name','comment','created_at']
+
+  def person_name(self,obj):
+    return f"{obj.user.first_name} {obj.user.last_name}"
+  
+  def menu_name(self,obj):
+    return f"{obj.menu_item.name}"
+  
+
+admin.site.register(Review,ReviewAdmin)
