@@ -16,7 +16,7 @@ class SpecificOrderUser(filters.BaseFilterBackend):
     user_id=request.query_params.get('user_id')
     if user_id:
       return query_set.filter(user=user_id)
-    return query_set
+    return query_set.order_by('-order_date')
 
 
 class OrderViewSet(viewsets.ModelViewSet):
@@ -24,6 +24,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [SpecificOrderUser]
+
 
     def get_queryset(self):
         return Order.objects.filter()
@@ -61,7 +62,11 @@ class OrderItemViewSet(viewsets.ModelViewSet):
   queryset=OrderItem.objects.all()
   serializer_class=OrderItemSerializer
   permission_classes = [IsAuthenticated]
-  filter_backends = [SpecificOrderItemUser]
+  filter_backends = [SpecificOrderItemUser,filters.OrderingFilter]
+  ordering_fields = ['created_at']
+  ordering = ['-created_at']
+
+  
 
 
 

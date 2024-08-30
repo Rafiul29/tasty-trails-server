@@ -2,22 +2,38 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import viewsets,filters,status
+from rest_framework.decorators import action
+
 from django.db import IntegrityError
 from rest_framework.parsers import MultiPartParser, FormParser
 
 from .serializers import MenuItemSerializer,FavouriteSerializer,ReviewSerializer
 from .models import MenuItem,Favourite,Review
 from orders.models import Order,OrderItem
+
 # Create your views here.
 class MenuItemViewSet(viewsets.ModelViewSet):
   queryset=MenuItem.objects.all()
   serializer_class=MenuItemSerializer
-  filter_backends=[filters.SearchFilter]
+  filter_backends=[filters.SearchFilter,filters.OrderingFilter]
   search_fields = ['category__slug','name','slug']
-#   parser_classes = [FormParser]
+  ordering_fields = ['created_at']
+  ordering = ['-created_at']
 
   def get_queryset(self):
       return super().get_queryset()
+  
+  @action(detail=False, methods=['get'])
+  def discounted(self, request):
+        discounted_items = MenuItem.objects.filter(discount__gt=0).order_by('-discount','-created_at')
+
+        page = self.paginate_queryset(discounted_items)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(discounted_items, many=True)
+        return Response(serializer.data)
   
   def post(self, request, *args, **kwargs):
         serializer = MenuItemSerializer(data=request.data)
@@ -26,7 +42,7 @@ class MenuItemViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-  
+
 
 class SpecificFavouriteMenu(filters.BaseFilterBackend):
    def filter_queryset(self,request,query_set,view):
@@ -39,7 +55,9 @@ class SpecificFavouriteMenu(filters.BaseFilterBackend):
 class FavouriteViewSet(viewsets.ModelViewSet):
     queryset = Favourite.objects.all()
     serializer_class = FavouriteSerializer
-    filter_backends = [SpecificFavouriteMenu]
+    filter_backends = [SpecificFavouriteMenu,filters.OrderingFilter]
+    ordering_fields = ['created_at']
+    ordering = ['-created_at']
 
     def create(self, request, *args, **kwargs):
         user = request.data.get('user')
@@ -82,6 +100,11 @@ class ReviewViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         user = request.user  
         menu_item = request.data.get('menu_item')
+        comment=request.data.get('comment'),
+        rating=request.data.get('rating')
+
+        menu= MenuItem.objects.get(id=menu_item)
+        
 
         # Check if the user has ordered the item and the order has been delivered
         if OrderItem.objects.filter(user=user, menu_item=menu_item, order__status="Delivered").exists():
@@ -94,12 +117,18 @@ class ReviewViewSet(viewsets.ModelViewSet):
                 review = Review.objects.create(
                     user=user,  # Pass the User instance directly
                     menu_item_id=menu_item,  # Use the menu_item ID directly
-                    comment=request.data.get('comment'),
-                    rating=request.data.get('rating')
+                    comment=comment,
+                    rating=rating
                 )
                 
                 # Serialize the newly created review
                 serializer = ReviewSerializer(review)
+
+                # update menu item rating sum and reviewer count
+                menu.rating_sum+=int(rating)
+                menu.count_reviewer+=1
+                menu.save()
+
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             
             except IntegrityError:

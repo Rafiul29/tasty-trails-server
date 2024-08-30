@@ -3,7 +3,7 @@ from .models import MenuItem, Favourite, Review
 # Register your models here.
 
 class  MenuItemAdmin(admin.ModelAdmin):
-  list_display=['id','menu_name','price','category','discount','avarate_rating','user']
+  list_display=['id','menu_name','price','category','discount','avarate_rating','created_at','user']
   prepopulated_fields={'slug':('name',),}
   def menu_name(self,obj):
     return f"{obj.name}"
@@ -11,7 +11,7 @@ class  MenuItemAdmin(admin.ModelAdmin):
 admin.site.register(MenuItem,MenuItemAdmin)
 
 class  FavouriteAdmin(admin.ModelAdmin):
-  list_display=['id','person_name','menu_name']
+  list_display=['id','person_name','menu_name','created_at']
 
   def person_name(self,obj):
     return f"{obj.user.first_name} {obj.user.last_name}"
