@@ -71,7 +71,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         menu_item = request.query_params.get('menu_item')
-        queryset = self.get_queryset()
+        queryset = self.get_queryset().order_by('-created_at')
         
         if menu_item:
             queryset = queryset.filter(menu_item=menu_item)
@@ -86,8 +86,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
         # Check if the user has ordered the item and the order has been delivered
         if OrderItem.objects.filter(user=user, menu_item=menu_item, order__status="Delivered").exists():
             # Check if the user has already reviewed the menu item
-            if Review.objects.filter(user=user, menu_item=menu_item).exists():
-                return Response({"error": "You have already reviewed this menu item."}, status=status.HTTP_400_BAD_REQUEST)
+            # if Review.objects.filter(user=user, menu_item=menu_item).exists():
+            #     return Response({"error": "You have already reviewed this menu item."}, status=status.HTTP_400_BAD_REQUEST)
             
             try:
                 # Manually create the review instance, passing the actual User instance
