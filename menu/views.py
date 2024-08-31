@@ -6,7 +6,7 @@ from rest_framework.decorators import action
 
 from django.db import IntegrityError
 from rest_framework.parsers import MultiPartParser, FormParser
-
+from django.db.models import Count
 from .serializers import MenuItemSerializer,FavouriteSerializer,ReviewSerializer
 from .models import MenuItem,Favourite,Review
 from orders.models import Order,OrderItem
@@ -14,6 +14,11 @@ from rest_framework.pagination import PageNumberPagination
 
 class CustomPagination(PageNumberPagination):
     page_size = 5  # Number of items per page
+    page_size_query_param = 'page_size'
+    max_page_size = 100  # Maximum page size
+
+class CustomPaginationMostFavourite(PageNumberPagination):
+    page_size = 10  # Number of items per page
     page_size_query_param = 'page_size'
     max_page_size = 100  # Maximum page size
 
@@ -69,16 +74,46 @@ class FavouriteViewSet(viewsets.ModelViewSet):
     ordering_fields = ['created_at']
     ordering = ['-created_at']
 
-    def create(self, request, *args, **kwargs):
-        user = request.data.get('user')
-        menu_item = request.data.get('menu_item')
+    @action(detail=False, methods=['get'])
+    def most_favourite(self, request):
+
+        queryset = self.get_queryset()
+        queryset = queryset.values('menu_item').annotate(count=Count('menu_item')).order_by('-count')
+        unique_items = [item['menu_item'] for item in queryset]
+        # print(unique_items)
         
+        unique_items_queryset = self.get_queryset().filter(menu_item__in=unique_items)
+    
+        # Use a dictionary t
+        # o filter unique items by 'menu_item'
+        seen = set()
+        unique_items = []
+        for item in unique_items_queryset:
+          if item.menu_item not in seen:
+             unique_items.append(item)
+             seen.add(item.menu_item)
+
+        # Apply pagination
+        paginator = CustomPaginationMostFavourite()
+        result_page = paginator.paginate_queryset(unique_items, request, view=self)
+        serializer = self.get_serializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        user = request.user
+        menu_item = request.data.get('menu_item')
+        menu= MenuItem.objects.get(id=menu_item)
         # Check if the user has already added this menu item to their favourite
         if Favourite.objects.filter(user=user, menu_item=menu_item).exists():
             return Response({"error": "This item is already in your favourites."}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            return super().create(request, *args, **kwargs)
+            favouritemenu=Favourite.objects.create(
+                user=user,
+                menu_item=menu,
+            )
+            serializer = FavouriteSerializer(favouritemenu)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         except IntegrityError:
             return Response({"error": "This item is already in your favourites."}, status=status.HTTP_400_BAD_REQUEST)
     

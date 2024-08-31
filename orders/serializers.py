@@ -140,7 +140,7 @@ class OrderSerializer(serializers.ModelSerializer):
             order=order,
             menu_item=item.menu_item,
             quantity=item.quantity,
-            price=item.menu_item.price-(item.menu_item.price*item.menu_item.discount/100)
+            price=item.menu_item.price-item.menu_item.price*item.menu_item.discount/100
             )
 
         user_account.balance-=order_total

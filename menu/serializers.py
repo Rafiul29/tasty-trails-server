@@ -14,7 +14,7 @@ class MenuItemSerializer(serializers.ModelSerializer):
 
 class FavouriteSerializer(serializers.ModelSerializer):
   # user=serializers.StringRelatedField(many=False)
-  # menu_item=serializers.StringRelatedField(many=False)
+  menu_item=MenuItemSerializer()
   class Meta:
     model=Favourite
     fields='__all__'
