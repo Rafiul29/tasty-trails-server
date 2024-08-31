@@ -10,6 +10,12 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from .serializers import MenuItemSerializer,FavouriteSerializer,ReviewSerializer
 from .models import MenuItem,Favourite,Review
 from orders.models import Order,OrderItem
+from rest_framework.pagination import PageNumberPagination
+
+class CustomPagination(PageNumberPagination):
+    page_size = 5  # Number of items per page
+    page_size_query_param = 'page_size'
+    max_page_size = 100  # Maximum page size
 
 # Create your views here.
 class MenuItemViewSet(viewsets.ModelViewSet):
@@ -32,8 +38,12 @@ class MenuItemViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
-        serializer = self.get_serializer(discounted_items, many=True)
-        return Response(serializer.data)
+         # Apply pagination
+        paginator = CustomPagination()
+        result_page = paginator.paginate_queryset(discounted_items, request, view=self)
+        serializer = self.get_serializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
+  
   
   def post(self, request, *args, **kwargs):
         serializer = MenuItemSerializer(data=request.data)
