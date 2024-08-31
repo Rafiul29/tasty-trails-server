@@ -82,7 +82,7 @@ class OrderItemViewSet(viewsets.ModelViewSet):
     def recent_order(self, request):
         queryset = self.get_queryset().order_by('-created_at')
   
-        queryset=queryset.filter(order__status='Delivered')
+        # queryset=queryset.filter(order__status='Delivered')
         # Use a dictionary to filter unique items by 'menu_item'
         seen = set()
         unique_items = []
