@@ -5,7 +5,6 @@ from rest_framework import viewsets,filters,status
 from rest_framework.decorators import action
 
 from django.db import IntegrityError
-from rest_framework.parsers import MultiPartParser, FormParser
 from django.db.models import Count
 from .serializers import MenuItemSerializer,FavouriteSerializer,ReviewSerializer
 from .models import MenuItem,Favourite,Review
@@ -59,18 +58,18 @@ class MenuItemViewSet(viewsets.ModelViewSet):
 
 
 
-class SpecificFavouriteMenu(filters.BaseFilterBackend):
-   def filter_queryset(self,request,query_set,view):
-    user_id=request.query_params.get('user_id')
-    if user_id:
-      return query_set.filter(user=user_id)
-    return query_set
+# class SpecificFavouriteMenu(filters.BaseFilterBackend):
+#    def filter_queryset(self,request,query_set,view):
+#     user_id=request.query_params.get('user_id')
+#     if user_id:
+#       return query_set.filter(user=user_id)
+#     return query_set
 
 
 class FavouriteViewSet(viewsets.ModelViewSet):
     queryset = Favourite.objects.all()
     serializer_class = FavouriteSerializer
-    filter_backends = [SpecificFavouriteMenu,filters.OrderingFilter]
+    filter_backends = [filters.OrderingFilter]
     ordering_fields = ['created_at']
     ordering = ['-created_at']
 
@@ -98,7 +97,21 @@ class FavouriteViewSet(viewsets.ModelViewSet):
         result_page = paginator.paginate_queryset(unique_items, request, view=self)
         serializer = self.get_serializer(result_page, many=True)
         return paginator.get_paginated_response(serializer.data)
+    
+    # user favourite menu
+    @action(detail=False, methods=['get'])
+    def user_favourite(self, request):
+        user=request.user
+        queryset = self.get_queryset()
+        favouritemenus = self.queryset.filter(user=user).order_by('-created_at')
 
+        # Apply pagination
+        paginator = CustomPaginationMostFavourite()
+        result_page = paginator.paginate_queryset(favouritemenus, request, view=self)
+        serializer = self.get_serializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
+    
+    # create favourite menu 
     def create(self, request, *args, **kwargs):
         user = request.user
         menu_item = request.data.get('menu_item')
@@ -116,7 +129,8 @@ class FavouriteViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except IntegrityError:
             return Response({"error": "This item is already in your favourites."}, status=status.HTTP_400_BAD_REQUEST)
-    
+        
+    # delete favourite menu item
     def destroy(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
