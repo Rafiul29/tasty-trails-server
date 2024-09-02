@@ -29,9 +29,18 @@ class MenuItemViewSet(viewsets.ModelViewSet):
   search_fields = ['category__slug','name','slug']
   ordering_fields = ['created_at']
   ordering = ['-created_at']
+  pagination_class = CustomPagination
+
 
   def get_queryset(self):
       return super().get_queryset()
+
+  def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())  # Apply search and ordering
+        paginator = self.pagination_class()
+        result_page = paginator.paginate_queryset(queryset, request, view=self)
+        serializer = self.get_serializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
   
   @action(detail=False, methods=['get'])
   def discounted(self, request):
@@ -55,15 +64,6 @@ class MenuItemViewSet(viewsets.ModelViewSet):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-# class SpecificFavouriteMenu(filters.BaseFilterBackend):
-#    def filter_queryset(self,request,query_set,view):
-#     user_id=request.query_params.get('user_id')
-#     if user_id:
-#       return query_set.filter(user=user_id)
-#     return query_set
 
 
 class FavouriteViewSet(viewsets.ModelViewSet):
