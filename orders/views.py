@@ -14,6 +14,10 @@ from rest_framework.pagination import PageNumberPagination
 
 
 
+class CustomPagination(PageNumberPagination):
+    page_size = 5  # Number of items per page
+    page_size_query_param = 'page_size'
+    max_page_size = 100  # Maximum page size
 
 
 class SpecificOrderUser(filters.BaseFilterBackend):
@@ -32,10 +36,28 @@ class OrderViewSet(viewsets.ModelViewSet):
     ordering_fields = ['order_date']
     ordering = ['-order_date']
 
+    def list(self, request, *args, **kwargs):
+        allorders = self.get_queryset().order_by('-order_date')
+   
+     # Apply pagination
+        paginator = CustomPagination()
+        result_page = paginator.paginate_queryset(allorders, request, view=self)
+        serializer = self.get_serializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
+       
+        # user favourite menu
+    @action(detail=False, methods=['get'])
+    def user_orders(self, request):
+        user=request.user
+        queryset = self.get_queryset()
+        orders = self.queryset.filter(user=user).order_by('-order_date')
 
-    def get_queryset(self):
-        return Order.objects.filter()
-
+        # Apply pagination
+        paginator = CustomPagination()
+        result_page = paginator.paginate_queryset(orders, request, view=self)
+        serializer = self.get_serializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
+    
 
     def update(self, request, *args, **kwargs):
       print(kwargs,args)
@@ -55,11 +77,6 @@ class OrderViewSet(viewsets.ModelViewSet):
       else:
           return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-class CustomPagination(PageNumberPagination):
-    page_size = 5  # Number of items per page
-    page_size_query_param = 'page_size'
-    max_page_size = 100  # Maximum page size
 
 class SpecificOrderItemUser(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
