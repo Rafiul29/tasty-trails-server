@@ -39,7 +39,7 @@ class UserRegistrationView(APIView):
             # create UserBank account 
             account_no=user.id+10000
             UserBankAccount.objects.create(user=user, account_no=account_no)
-            return Response({'success': 'Check your confirmation mail. Please verify account'}, status=status.HTTP_200_OK)
+            return Response({'success': 'Check your confirmation mail. Please verify account','email':user.email}, status=status.HTTP_200_OK)
         
         return Response(serializer.errors)   
 
@@ -56,7 +56,7 @@ def activate(request,uid64,token):
         user.save()
         # return Response({"error": "User does not have a bank account."}, status=status.HTTP_400_BAD_REQUEST)
         # return Response('User Account activate')
-        return redirect(settings.LOGIN_URL)
+        return redirect(settings.VERIFIED_URL)
     else:
         return Response(settings.REGISTER_URL)
     

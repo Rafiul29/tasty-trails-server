@@ -32,6 +32,7 @@ ALLOWED_HOSTS = ["*"]
 
 LOGIN_URL=env('APP_LOGIN_URL')
 REGISTER_URL=env('APP_REGISTER_URL')
+VERIFIED_URL=env('APP_VERIFIED_URL')
 
 # Application definition
 
