@@ -42,7 +42,7 @@ STAR_CHOICES=[
 class Review(models.Model):
   user=models.ForeignKey(User,on_delete=models.CASCADE)
   menu_item=models.ForeignKey(MenuItem,on_delete=models.CASCADE)
-  comment=models.TextField(max_length=100)
+  comment=models.TextField()
   rating=models.CharField(choices=STAR_CHOICES,max_length=1)
   created_at=models.DateTimeField(auto_now_add=True)
 

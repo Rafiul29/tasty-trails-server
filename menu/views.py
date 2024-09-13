@@ -104,7 +104,7 @@ class FavouriteViewSet(viewsets.ModelViewSet):
         user=request.user
         queryset = self.get_queryset()
         favouritemenus = self.queryset.filter(user=user).order_by('-created_at')
-
+        print(len(favouritemenus),user)
         # Apply pagination
         paginator = CustomPaginationMostFavourite()
         result_page = paginator.paginate_queryset(favouritemenus, request, view=self)
@@ -161,10 +161,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
         menu_item = request.data.get('menu_item')
         comment=request.data.get('comment'),
         rating=request.data.get('rating')
-
         menu= MenuItem.objects.get(id=menu_item)
         
-
         # Check if the user has ordered the item and the order has been delivered
         if OrderItem.objects.filter(user=user, menu_item=menu_item, order__status="Delivered").exists():
             # Check if the user has already reviewed the menu item
