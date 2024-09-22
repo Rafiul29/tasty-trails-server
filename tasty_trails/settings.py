@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-v%$cvtio#50q+s87pqe3mxr1gx4=2gip6w3tjgg%cy9r9#gzxi
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["*",".vercel.app"]
 
 
 LOGIN_URL=env('APP_LOGIN_URL')
@@ -63,7 +63,7 @@ CORS_ORIGIN_WHITELIST = (
 )
 CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000',"http://localhost:8000", "https://tasty-trails-server.onrender.com",]
 
-CORS_ALLOW_ALL_ORIGINS=True
+CORS_ALLOW_ALL_ORIGINS = True
 
 AUTH_USER_MODEL = 'account.User'
 
