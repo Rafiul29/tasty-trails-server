@@ -1,13 +1,17 @@
 {
-  "builds": [{
-    "src": "tasty_trails/wsgi.py",
-    "use": "@vercel/python",
-    "config": { "maxLambdaSize": "15mb", "runtime": "python3.11.3" }
-  }],
+  "builds": [
+    {
+      "src": "tasty_trails/wsgi.py",
+      "use": "@vercel/python"
+    }
+  ],
   "routes": [
     {
       "src": "/(.*)",
       "dest": "tasty_trails/wsgi.py"
     }
-  ]
+  ],
+  "hooks": {
+    "build": "pip install -r requirements.txt"
+  }
 }
