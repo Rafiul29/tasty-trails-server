@@ -13,5 +13,8 @@
   ],
   "hooks": {
     "build": "pip install -r requirements.txt"
+  },
+  "env": {
+    "PYTHON_VERSION": "3.9" 
   }
 }
