@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-v%$cvtio#50q+s87pqe3mxr1gx4=2gip6w3tjgg%cy9r9#gzxi
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*",".vercel.app"]
+ALLOWED_HOSTS = ["*",".vercel.app",'127.0.0.1']
 
 
 LOGIN_URL=env('APP_LOGIN_URL')
@@ -37,9 +37,9 @@ VERIFIED_URL=env('APP_VERIFIED_URL')
 # Application definition
 
 INSTALLED_APPS = [
+    "whitenoise.runserver_nostatic",
     'rest_framework',
     'rest_framework.authtoken',
-
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -84,12 +84,14 @@ REST_FRAMEWORK = {
 MIDDLEWARE = [
   "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'tasty_trails.urls'
@@ -111,7 +113,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'tasty_trails.wsgi.application'
+WSGI_APPLICATION = 'tasty_trails.wsgi.app'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -161,6 +163,8 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 MEDIA_URL = '/media/'
+STATIC_ROOT= BASE_DIR / 'staticfiles'
+
 # MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
