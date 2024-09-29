@@ -86,3 +86,4 @@ wadllib
 wheel
 xkit
 zipp
+backports.zoneinfo==0.2.1
