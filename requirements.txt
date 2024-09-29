@@ -1,6 +1,5 @@
 apturl
 asgiref
-backports.zoneinfo
 bcrypt
 blinker
 Brlapi
