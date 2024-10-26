@@ -31,7 +31,7 @@ Welcome to the backend repository for **TastyTrails**, your ultimate guide to de
 
 ## API Endpoints
 
-**Backend API Base URL**: `https://tasty-trails-server.onrender.com`
+**Backend API Base URL**: `http://localhost:8000/`
 
 ### User Management
 - `POST /api/auth/register` - Register a new user
