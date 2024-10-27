@@ -39,6 +39,7 @@ urlpatterns = [
     path('carts/',include('carts.urls')),
     path('orders/',include('orders.urls')),
     path('ourstatistics/',ourstatistics,name='ourstatistics'),
+    path('', include('payment.urls')),
 ]
 
 

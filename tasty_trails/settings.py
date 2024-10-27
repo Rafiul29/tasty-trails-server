@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'category',
     'carts',
     'orders',
+    'payment',
 ]
 
 CORS_ORIGIN_WHITELIST = (
