@@ -27,6 +27,13 @@ status_choices = [
         ('Cancelled', 'Cancelled'),
     ]
 
+payment_type_choices = [
+        ('Card', 'Card'),
+        ('Cash On', 'Cash On'),
+        ('Mobile Banking', 'Mobile Banking'),
+        ('Account Balance', 'Account Balance'),
+    ]
+
 class Order(models.Model):
   order_number=models.CharField(max_length=10,unique=True,blank=True,null=True)
   user = models.ForeignKey(User, on_delete=models.CASCADE,null=True)
@@ -34,6 +41,8 @@ class Order(models.Model):
   order_total = models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True)
   order_date = models.DateTimeField(auto_now_add=True)
   total_discount=models.IntegerField(null=True,blank=True,default=0)
+  payment_id=models.CharField(null=True,blank=True,default=0)
+  payment_type=models.CharField(max_length=20, choices=payment_type_choices, default='Cash On')
   status = models.CharField(max_length=20, choices=status_choices, default='Pending')
 
   def __str__(self) -> str:
