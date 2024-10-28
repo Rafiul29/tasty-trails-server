@@ -3,6 +3,12 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 from sslcommerz_lib import SSLCOMMERZ
+from orders.models import Order 
+import uuid
+from django.conf import settings
+from django.shortcuts import render,redirect
+from account.models import User
+
 
 class PaymentViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['post'])
@@ -14,12 +20,12 @@ class PaymentViewSet(viewsets.ViewSet):
             'issandbox': True
         }
         sslcz = SSLCOMMERZ(settings)
-
         # Extract data from the request
-        total_amount = request.data.get('total_amount', 100.26)
+        tran_id = str(uuid.uuid4())[:10].replace('-', '').upper()
+
+        total_amount = request.data.get('total_amount', 000.26)
         currency = request.data.get('currency', "BDT")
-        tran_id = request.data.get('tran_id', "12345")
-        success_url = request.data.get('success_url', "your success url")
+        success_url = request.build_absolute_uri(f'/payment/success/')
         fail_url = request.data.get('fail_url', "your fail url")
         cancel_url = request.data.get('cancel_url', "your cancel url")
         cus_name = request.data.get('cus_name', "test")
@@ -55,6 +61,26 @@ class PaymentViewSet(viewsets.ViewSet):
         # Create payment session with SSLCommerz
         response = sslcz.createSession(post_body)
         if response.get('status') == 'SUCCESS' and 'GatewayPageURL' in response:
-            print("Yes i am listening")
-            return Response({"url": response['GatewayPageURL']}, status=status.HTTP_200_OK)
+            return Response({"url": response['GatewayPageURL'],"tran_id":tran_id}, status=status.HTTP_200_OK)
         return Response({"error": "Unable to create payment session"}, status=status.HTTP_400_BAD_REQUEST)
+
+       # Handle payment success
+    @action(detail=False, methods=['post'])
+    def success(self, request):
+        return redirect(settings.SUCCESS_URL)
+        #return Response({"message": "Payment successful, order created"}, status=status.HTTP_201_CREATED)
+        # return Response({"error": "Payment validation failed"}, status=status.HTTP_400_BAD_REQUEST)
+
+       
+            # Create an order if payment is validated
+            # order = Order.objects.create(
+            #     user=request.user,  # Adjust this to retrieve user from request or add it as needed
+            #     transaction_id=tran_id,
+            #     amount=validation_response.get('amount'),
+            #     currency=validation_response.get('currency'),
+            #     status='Paid'
+            # )
+        
+            # return Response({"message": "Payment successful, order created", "order_id": order.id}, status=status.HTTP_201_CREATED)
+        
+        

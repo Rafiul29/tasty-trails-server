@@ -89,6 +89,10 @@ class OrderSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
       
         delivery_address_data = validated_data.pop('delivery_address')
+        status = validated_data.pop('status')
+        payment_type=validated_data.pop("payment_type")
+        payment_status=validated_data.pop("payment_status")
+        payment_id=validated_data.pop("payment_id")
         
      
         user = self.context['request'].user
@@ -118,22 +122,21 @@ class OrderSerializer(serializers.ModelSerializer):
         order_number = str(uuid.uuid4())[:10].replace('-', '').upper()
 
      
-        user_account = UserBankAccount.objects.filter(user=user).first()
+        # user_account = UserBankAccount.objects.filter(user=user).first()
 
-        if user_account is None:
-            raise serializers.ValidationError({'error': "User does not have a bank account"})
+        # if user_account is None:
+        #     raise serializers.ValidationError({'error': "User does not have a bank account"})
 
-        if user_account.balance < order_total:
-            raise serializers.ValidationError({'error': "Insufficient balance ! Please doposit balance"})
+        # if user_account.balance < order_total:
+        #     raise serializers.ValidationError({'error': "Insufficient balance ! Please doposit balance"})
 
        
         delivery_address = DeliveryAddress.objects.create(**delivery_address_data)
 
         order = Order.objects.create(
-           delivery_address=delivery_address,order_number=order_number,total_discount=total_discount,order_total=order_total,**validated_data
+           delivery_address=delivery_address,order_number=order_number,payment_type=payment_type,payment_status=payment_status,payment_id=payment_id,total_discount=total_discount,order_total=order_total,**validated_data
         )
-
-
+        
         for item in active_cart_items:
             OrderItem.objects.create(
             user=user,
@@ -143,8 +146,8 @@ class OrderSerializer(serializers.ModelSerializer):
             price=item.menu_item.price-item.menu_item.price*item.menu_item.discount/100
             )
 
-        user_account.balance-=order_total
-        user_account.save()
+        # user_account.balance-=order_total
+        # user_account.save()
 
         active_cart_items.delete()
 

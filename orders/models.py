@@ -28,11 +28,17 @@ status_choices = [
     ]
 
 payment_type_choices = [
-        ('Card', 'Card'),
-        ('Cash On', 'Cash On'),
-        ('Mobile Banking', 'Mobile Banking'),
-        ('Account Balance', 'Account Balance'),
+        ('Cash On Delivary', 'Cash On Delivary'),
+        ('Online Payment', 'Online Payment'),
     ]
+
+payment_status = [
+        ('Success', 'Success'),
+        ('Cancle', 'Cancle'),
+        ('Failed', 'Failed'),
+        ('Pending', 'Pending')
+    ]
+
 
 class Order(models.Model):
   order_number=models.CharField(max_length=10,unique=True,blank=True,null=True)
@@ -42,7 +48,8 @@ class Order(models.Model):
   order_date = models.DateTimeField(auto_now_add=True)
   total_discount=models.IntegerField(null=True,blank=True,default=0)
   payment_id=models.CharField(null=True,blank=True,default=0)
-  payment_type=models.CharField(max_length=20, choices=payment_type_choices, default='Cash On')
+  payment_type=models.CharField(max_length=20, choices=payment_type_choices, default='Cash On Delivary')
+  payment_status=models.CharField(max_length=20,choices=payment_status, default='Pending')
   status = models.CharField(max_length=20, choices=status_choices, default='Pending')
 
   def __str__(self) -> str:

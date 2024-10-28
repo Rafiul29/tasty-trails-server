@@ -29,13 +29,13 @@ SECRET_KEY = 'django-insecure-v%$cvtio#50q+s87pqe3mxr1gx4=2gip6w3tjgg%cy9r9#gzxi
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*",".vercel.app",'127.0.0.1']
+ALLOWED_HOSTS = ["*",".vercel.app",'127.0.0.1','https://tasty-trails-client.vercel.app/']
 
 
 LOGIN_URL=env('APP_LOGIN_URL')
 REGISTER_URL=env('APP_REGISTER_URL')
 VERIFIED_URL=env('APP_VERIFIED_URL')
-
+SUCCESS_URL='https://tasty-trails-client.vercel.app/success/'
 # Application definition
 
 INSTALLED_APPS = [
