@@ -26,8 +26,8 @@ class PaymentViewSet(viewsets.ViewSet):
         total_amount = request.data.get('total_amount', 000.26)
         currency = request.data.get('currency', "BDT")
         success_url = request.build_absolute_uri(f'/payment/success/')
-        fail_url = request.data.get('fail_url', "your fail url")
-        cancel_url = request.data.get('cancel_url', "your cancel url")
+        fail_url = request.build_absolute_uri(f'/payment/cancle/')
+        cancel_url = request.build_absolute_uri(f'/payment/fail/')
         cus_name = request.data.get('cus_name', "test")
         cus_email = request.data.get('cus_email', "test@test.com")
         cus_phone = request.data.get('cus_phone', "01700000000")
@@ -83,4 +83,8 @@ class PaymentViewSet(viewsets.ViewSet):
         
             # return Response({"message": "Payment successful, order created", "order_id": order.id}, status=status.HTTP_201_CREATED)
         
-        
+    def cancle(self, request):
+        return redirect(settings.CANCLE_URL)
+    
+    def fail(self, request):
+        return redirect(settings.FAIL_URL)

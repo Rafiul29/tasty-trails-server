@@ -36,6 +36,8 @@ LOGIN_URL=env('APP_LOGIN_URL')
 REGISTER_URL=env('APP_REGISTER_URL')
 VERIFIED_URL=env('APP_VERIFIED_URL')
 SUCCESS_URL='https://tasty-trails-client.vercel.app/success/'
+CANCLE_URL='https://tasty-trails-client.vercel.app/cancle/'
+FAIL_URL='https://tasty-trails-client.vercel.app/fail/'
 # Application definition
 
 INSTALLED_APPS = [
