@@ -82,9 +82,10 @@ class PaymentViewSet(viewsets.ViewSet):
             # )
         
             # return Response({"message": "Payment successful, order created", "order_id": order.id}, status=status.HTTP_201_CREATED)
-        
+    @action(detail=False, methods=['get'])
     def cancle(self, request):
         return redirect(settings.CANCLE_URL)
     
+    @action(detail=False, methods=['get'])
     def fail(self, request):
         return redirect(settings.FAIL_URL)
