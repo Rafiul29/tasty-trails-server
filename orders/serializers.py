@@ -92,7 +92,7 @@ class OrderSerializer(serializers.ModelSerializer):
         status = validated_data.pop('status')
         payment_type=validated_data.pop("payment_type")
         payment_status=validated_data.pop("payment_status")
-        payment_id=validated_data.pop("payment_id")
+        
         
      
         user = self.context['request'].user
@@ -120,7 +120,7 @@ class OrderSerializer(serializers.ModelSerializer):
         order_total += tax
         
         order_number = str(uuid.uuid4())[:10].replace('-', '').upper()
-
+        payment_id = str(uuid.uuid4())[:10].replace('-', '').upper()
      
         # user_account = UserBankAccount.objects.filter(user=user).first()
 
