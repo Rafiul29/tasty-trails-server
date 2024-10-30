@@ -70,7 +70,10 @@ class PaymentViewSet(viewsets.ViewSet):
         }
 
         try:
-            User.objects.get(id=user_id)
+            user=User.objects.get(id=user_id)
+            active_cart_items = CartItem.objects.filter(user=user, is_active=True)
+            if not active_cart_items.exists():
+                return Response({"error": "No active cart items found for the user."}, status=status.HTTP_404_NOT_FOUND)
             response = sslcz.createSession(post_body)
             if response.get('status') == 'SUCCESS' and 'GatewayPageURL' in response:
                 return Response({"url": response['GatewayPageURL']})
